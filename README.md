@@ -1,16 +1,16 @@
-# Slack Nuke
+# Slack Lock
 
-A one-button Android app that blocks Slack until 6 am.
+An Android self-binding app that prevents opening the Slack app until the next 6 AM.
 
-Tap the big red button → Slack is force-closed every time you try to open it, until the next 6 am in your local time zone. There is no off-switch in the UI. The only way to lift the block early is to **uninstall the app**.
+The app is intentionally narrow: one button, one confirmation, one Accessibility service scoped to Slack's Android package (`com.Slack`). During an active lock, opening Slack sends you back to the home screen.
 
-Built for Android 8+ (tested on Pixel 8 / Android 14).
+This does not force-stop Slack, mute notifications, block Slack in a browser, or block Slack in another Android profile. Pair it with Android Focus/DND or Slack notification settings if notifications are the real trigger.
+
+Built for Android 8+.
 
 ---
 
 ## Install on your phone
-
-The phone-side flow is one-time setup, ~90 seconds total. After that, the cycle is just: open app → tap button → done.
 
 ### 1. Get the APK
 
@@ -18,76 +18,87 @@ Every push to `main` builds a fresh APK and attaches it to a rolling release at:
 
 > **https://github.com/rishavpunatar/slack-nuke/releases/latest**
 
-On your Pixel 8, open that page in Chrome and tap `slack-nuke.apk` to download.
+On your phone, open that page in Chrome and tap `slack-nuke.apk` to download.
 
 ### 2. Allow installs from your browser
 
 The first time you do this on a Pixel:
 
-1. Tap the downloaded APK in Chrome's downloads (or Files app → Downloads → `slack-nuke.apk`).
-2. Android will say "For your security, your phone isn't allowed to install unknown apps from this source."
-3. Tap **Settings**, toggle **Allow from this source** on, hit back.
+1. Tap the downloaded APK in Chrome's downloads, or in Files -> Downloads.
+2. Android will say your browser is not allowed to install unknown apps.
+3. Tap **Settings**, enable **Allow from this source**, then go back.
 4. Tap **Install**.
 
-### 3. Grant Accessibility permission (one-time)
+### 3. Grant Accessibility permission
 
-Open **Slack Nuke**, tap the big red button. The app will pop a dialog asking you to enable Accessibility, then take you to Settings.
+Open **Slack Lock** and tap the button. The app first shows an in-app Accessibility disclosure explaining what it can and cannot see. Accepting that disclosure opens Android Settings.
 
-In the Accessibility settings list, find **Slack Nuke** and toggle it on.
+In the Accessibility settings list, find **Slack Lock** and toggle it on.
 
-> **If the toggle is greyed out** (Android 13+ blocks sideloaded apps from accessibility services by default):
-> 1. Long-press the Slack Nuke icon → **App info**.
-> 2. Tap the **⋮** menu in the top-right corner.
-> 3. Tap **Allow restricted settings**.
-> 4. Go back to Settings → Accessibility → Slack Nuke and toggle it on now.
+If the toggle is greyed out on Android 13+:
 
-This is an Android security guardrail, not a bug. Apps that watch other apps' screens have to be unlocked manually.
+1. Long-press the Slack Lock icon and open **App info**.
+2. Tap the three-dot menu in the top-right corner.
+3. Tap **Allow restricted settings**.
+4. Go back to Settings -> Accessibility -> Slack Lock and toggle it on.
+
+Android restricts sideloaded apps from enabling sensitive settings until you explicitly trust them. That is expected.
 
 ### 4. Use it
 
-Re-open Slack Nuke, tap the button. Slack is now blocked until the next 6 am. Try opening Slack — it'll get yanked back to the home screen the moment it appears.
+Open **Slack Lock**, tap the button, and confirm the lock. Slack is then blocked until the next 6 AM in your phone's local time zone.
 
-To unblock early: uninstall Slack Nuke (long-press icon → App info → Uninstall).
+There is no in-app undo while a lock is active. To stop early, leave the app and either disable **Slack Lock** in Android Accessibility Settings or uninstall the app.
+
+---
+
+## Safety model
+
+Slack Lock uses Accessibility only for a deterministic rule:
+
+> If the Slack Android app opens during an active lock, perform Android's global Home action.
+
+The service configuration is deliberately limited:
+
+- Receives only `typeWindowStateChanged` events.
+- Receives events only from `com.Slack`.
+- Cannot retrieve window content.
+- Cannot perform gestures.
+- Does not request network access.
+- Does not collect, store, or transmit data.
+
+This app is not presented as an accessibility tool for people with disabilities. It is a personal automation/self-binding tool, so the app includes a prominent in-app disclosure and requires explicit consent before sending you to Accessibility Settings.
 
 ---
 
 ## How it works
 
-There are three small pieces:
+- `MainActivity` handles the single-screen UI, the Accessibility disclosure, the final lock confirmation, and the visible enforcement status.
+- `BlockerService` is an Android `AccessibilityService` that listens for Slack foreground events and sends the device home during an active lock.
+- `BlockState` stores `blockUntilMillis` and computes the next local 6 AM.
 
-- **`MainActivity`** — the single-screen UI. While the block is inactive, it shows the big button. While the block is active, it shows the expiry time and hides the button entirely.
-- **`BlockerService`** — an Android `AccessibilityService` configured (via [`accessibility_config.xml`](app/src/main/res/xml/accessibility_config.xml)) to receive `typeWindowStateChanged` events for `com.Slack` only. When such an event arrives during an active block window, it calls `performGlobalAction(GLOBAL_ACTION_HOME)` to send you back to the launcher.
-- **`BlockState`** — persists a `blockUntilMillis` value in `SharedPreferences`. The "next 6 am" timestamp is computed from `ZonedDateTime.now()` in the device's local time zone.
-
-The app does not use the network, doesn't request any sensitive permissions beyond Accessibility, and has no analytics.
-
-### What "no off-switch" actually means
-
-There is no UI affordance to clear an active block. Force-stopping the app from Settings won't help — the accessibility service is reattached by the system on the next foreground event. Clearing app data wipes the `blockUntilMillis` preference, so technically that is an escape hatch, but it costs more friction than a tap. The intended out is: **uninstall**.
-
-(This is also the safety valve. If something goes wrong, you can always uninstall and reinstall fresh.)
+If Accessibility is disabled while a lock is active, the app shows that the timer is still active but enforcement is off.
 
 ---
 
 ## Build it yourself
 
-You don't need to — CI builds an APK on every push and attaches it to the `latest` release. But if you want to:
+CI runs tests, builds a release APK, and attaches it to the `latest` release. Locally:
 
 ```bash
-# Requires JDK 17 and either Android Studio or a standalone Gradle 8.9.
+# Requires JDK 17 and Android SDK 34.
 git clone https://github.com/rishavpunatar/slack-nuke.git
 cd slack-nuke
-gradle wrapper --gradle-version=8.9   # one-time, generates ./gradlew
-./gradlew assembleDebug
-# APK at app/build/outputs/apk/debug/app-debug.apk
+./gradlew testDebugUnitTest assembleRelease
+# APK at app/build/outputs/apk/release/app-release.apk
 ```
 
-Or open the directory in Android Studio (Iguana or newer) and hit Run.
+The public repo builds a non-debuggable release variant signed with Android's debug signing config so it can be sideloaded without storing a private signing key in GitHub. For long-term distribution, create your own release keystore and replace the signing config.
 
 ---
 
-## Customising the schedule
+## Customizing
 
-The "next 6 am" rule lives in [`BlockState.kt`](app/src/main/java/com/slacknuke/BlockState.kt) — change the `LocalTime.of(6, 0)` to whatever wake-up time suits you, rebuild, reinstall.
+The 6 AM rule lives in [`BlockState.kt`](app/src/main/java/com/slacknuke/BlockState.kt). Change the `WAKE_TIME` value, rebuild, and reinstall.
 
-To block additional apps (e.g. Teams, Discord), edit [`accessibility_config.xml`](app/src/main/res/xml/accessibility_config.xml) and add their package names to `android:packageNames`, and update the check in [`BlockerService.kt`](app/src/main/java/com/slacknuke/BlockerService.kt).
+To block additional apps, add their package names to [`accessibility_config.xml`](app/src/main/res/xml/accessibility_config.xml) and update the package check in [`BlockerService.kt`](app/src/main/java/com/slacknuke/BlockerService.kt).

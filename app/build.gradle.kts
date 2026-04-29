@@ -20,9 +20,13 @@ android {
             isMinifyEnabled = false
         }
         release {
-            isMinifyEnabled = false
-            // Debug-signed so it can be installed without a keystore.
-            // Anyone building locally can swap in their own signing config.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            // Personal sideload release: do not store a private signing key in this public repo.
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -37,7 +41,5 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    testImplementation("junit:junit:4.13.2")
 }

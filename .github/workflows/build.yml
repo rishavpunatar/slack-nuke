@@ -20,17 +20,15 @@ jobs:
           java-version: '17'
 
       - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
 
-      - name: Generate gradle wrapper
-        run: gradle wrapper --gradle-version=8.9
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest --no-daemon
 
-      - name: Build debug APK
-        run: ./gradlew assembleDebug --no-daemon
+      - name: Build release APK
+        run: ./gradlew assembleRelease --no-daemon
 
       - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk slack-nuke.apk
+        run: cp app/build/outputs/apk/release/app-release.apk slack-nuke.apk
 
       - name: Upload APK as workflow artifact
         uses: actions/upload-artifact@v4
@@ -46,6 +44,6 @@ jobs:
           name: Latest build
           body: |
             Auto-built from the latest commit on `main`.
-            Download `slack-nuke.apk` below and sideload it on your phone.
+            Download `slack-nuke.apk` below and sideload Slack Lock on your phone.
           files: slack-nuke.apk
           make_latest: true

@@ -1,6 +1,8 @@
 package com.slacknuke
 
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.app.Activity
+import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -11,12 +13,10 @@ import android.view.View
 import android.view.accessibility.AccessibilityManager
 import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import java.text.DateFormat
 import java.util.Date
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
 
     private lateinit var bigButton: Button
     private lateinit var statusText: TextView
@@ -29,14 +29,7 @@ class MainActivity : AppCompatActivity() {
         statusText = findViewById(R.id.status_text)
         helpText = findViewById(R.id.help_text)
 
-        bigButton.setOnClickListener {
-            if (!isAccessibilityEnabled()) {
-                showEnableAccessibilityDialog()
-            } else {
-                BlockState.startBlockUntilNext6am(this)
-                refreshUi()
-            }
-        }
+        bigButton.setOnClickListener { handleButtonPress() }
     }
 
     override fun onResume() {
@@ -45,20 +38,45 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshUi() {
+        val accessibilityEnabled = isAccessibilityEnabled()
         if (BlockState.isBlocked(this)) {
             val until = Date(BlockState.blockUntilMillis(this))
             val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
-            statusText.text = getString(R.string.status_blocked, fmt.format(until))
+            statusText.text = if (accessibilityEnabled)
+                getString(R.string.status_blocked_enforcing, fmt.format(until))
+            else
+                getString(R.string.status_blocked_not_enforcing, fmt.format(until))
             statusText.visibility = View.VISIBLE
-            bigButton.visibility = View.GONE
-            helpText.text = getString(R.string.help_locked)
+            bigButton.visibility = if (accessibilityEnabled) View.GONE else View.VISIBLE
+            bigButton.text = getString(R.string.enable_enforcement_text)
+            helpText.text = if (accessibilityEnabled)
+                getString(R.string.help_locked)
+            else
+                getString(R.string.help_locked_not_enforcing)
         } else {
             statusText.visibility = View.GONE
             bigButton.visibility = View.VISIBLE
-            helpText.text = if (isAccessibilityEnabled())
+            bigButton.text = getString(R.string.big_button_text)
+            helpText.text = if (accessibilityEnabled)
                 getString(R.string.help_ready)
             else
                 getString(R.string.help_needs_permission)
+        }
+    }
+
+    private fun handleButtonPress() {
+        if (!BlockState.hasAcceptedAccessibilityDisclosure(this)) {
+            showAccessibilityDisclosureDialog()
+            return
+        }
+
+        if (!isAccessibilityEnabled()) {
+            showEnableAccessibilityDialog()
+            return
+        }
+
+        if (!BlockState.isBlocked(this)) {
+            showStartBlockConfirmation()
         }
     }
 
@@ -91,6 +109,36 @@ class MainActivity : AppCompatActivity() {
             .setMessage(R.string.enable_message)
             .setPositiveButton(R.string.enable_open) { _, _ ->
                 startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun showAccessibilityDisclosureDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.disclosure_title)
+            .setMessage(R.string.disclosure_message)
+            .setPositiveButton(R.string.disclosure_accept) { _, _ ->
+                BlockState.acceptAccessibilityDisclosure(this)
+                if (isAccessibilityEnabled()) {
+                    showStartBlockConfirmation()
+                } else {
+                    showEnableAccessibilityDialog()
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun showStartBlockConfirmation() {
+        val until = Date(BlockState.nextBlockUntilMillis())
+        val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.confirm_title)
+            .setMessage(getString(R.string.confirm_message, fmt.format(until)))
+            .setPositiveButton(R.string.confirm_lock) { _, _ ->
+                BlockState.startBlockUntilNext6am(this)
+                refreshUi()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()

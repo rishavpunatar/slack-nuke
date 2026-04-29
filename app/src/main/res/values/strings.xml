@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Slack Nuke</string>
-    <string name="big_button_text">BLOCK SLACK\nUNTIL 6 AM</string>
-    <string name="status_blocked">Slack is blocked until %1$s.\n\nThere is no off-switch. Wait, or uninstall this app.</string>
-    <string name="help_ready">Tap the button to block Slack until the next 6 am.</string>
-    <string name="help_needs_permission">Tap the button — you\'ll be asked to grant Accessibility permission first.</string>
-    <string name="help_locked">No way to undo this from inside the app. Uninstall to unblock early.</string>
+    <string name="app_name">Slack Lock</string>
+    <string name="big_button_text">LOCK SLACK\nUNTIL 6 AM</string>
+    <string name="enable_enforcement_text">ENABLE\nENFORCEMENT</string>
+    <string name="status_blocked_enforcing">Slack is locked until %1$s.\n\nEnforcement is on. Opening Slack returns you to the home screen.</string>
+    <string name="status_blocked_not_enforcing">Slack Lock runs until %1$s, but enforcement is off.\n\nRe-enable Accessibility to block Slack.</string>
+    <string name="help_ready">Tap when you are ready to lock Slack until the next 6 AM.</string>
+    <string name="help_needs_permission">Setup needed: the next tap explains Accessibility access, then opens Android Settings.</string>
+    <string name="help_locked">No in-app undo. To stop early, disable Slack Lock in Accessibility Settings or uninstall it.</string>
+    <string name="help_locked_not_enforcing">The timer is still active, but Slack is currently reachable because Accessibility is off.</string>
 
     <string name="enable_title">Grant Accessibility permission</string>
-    <string name="enable_message">Slack Nuke needs Accessibility permission to detect when Slack opens and close it. \n\nIn the next screen, find \"Slack Nuke\" and toggle it on. \n\nIf the toggle is greyed out (Android 13+), go back to App info, tap the ⋮ menu in the top-right and choose \"Allow restricted settings\" first.</string>
+    <string name="enable_message">Slack Lock needs Accessibility permission to detect when Slack opens during an active lock and send you back home. \n\nIn the next screen, find \"Slack Lock\" and toggle it on. \n\nIf the toggle is greyed out (Android 13+), go back to App info, tap the ⋮ menu in the top-right and choose \"Allow restricted settings\" first.</string>
     <string name="enable_open">Open settings</string>
 
-    <string name="accessibility_description">Detects when Slack is opened during a block window and sends you back to the home screen. Does not collect, store, or transmit any data.</string>
+    <string name="disclosure_title">Accessibility disclosure</string>
+    <string name="disclosure_message">Slack Lock uses Android Accessibility only to detect when the Slack app opens during an active lock. It receives Slack window-change events and sends you to the home screen. It does not read screen content, messages, typed text, notifications, files, or contacts, and it does not collect or share data.</string>
+    <string name="disclosure_accept">I understand</string>
+
+    <string name="confirm_title">Lock Slack until 6 AM?</string>
+    <string name="confirm_message">Opening Slack before %1$s will return you to the home screen. There is no in-app undo. To stop early, disable Slack Lock in Accessibility Settings or uninstall it.</string>
+    <string name="confirm_lock">Lock Slack</string>
+
+    <string name="accessibility_description">Detects when Slack is opened during an active lock and sends you back to the home screen. Does not collect, store, or transmit any data.</string>
 </resources>
