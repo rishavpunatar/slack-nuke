@@ -16,7 +16,7 @@ The phone-side flow is one-time setup, ~90 seconds total. After that, the cycle 
 
 Every push to `main` builds a fresh APK and attaches it to a rolling release at:
 
-> **https://github.com/USER/slack-nuke/releases/latest** *(replace `USER` after you push the repo)*
+> **https://github.com/rishavpunatar/slack-nuke/releases/latest**
 
 On your Pixel 8, open that page in Chrome and tap `slack-nuke.apk` to download.
 
@@ -75,7 +75,7 @@ You don't need to — CI builds an APK on every push and attaches it to the `lat
 
 ```bash
 # Requires JDK 17 and either Android Studio or a standalone Gradle 8.9.
-git clone https://github.com/USER/slack-nuke.git
+git clone https://github.com/rishavpunatar/slack-nuke.git
 cd slack-nuke
 gradle wrapper --gradle-version=8.9   # one-time, generates ./gradlew
 ./gradlew assembleDebug
