@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SlackNuke"
+rootProject.name = "SlackLock"
 include(":app")

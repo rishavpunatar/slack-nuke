@@ -1,4 +1,4 @@
-package com.slacknuke
+package com.slacklock
 
 import android.content.Context
 import java.time.LocalTime
@@ -12,7 +12,7 @@ import java.time.ZonedDateTime
  */
 object BlockState {
 
-    private const val PREFS = "slack_nuke_prefs"
+    private const val PREFS = "slack_lock_prefs"
     private const val KEY_BLOCK_UNTIL = "block_until_millis"
     private const val KEY_ACCESSIBILITY_DISCLOSURE_ACCEPTED = "accessibility_disclosure_accepted"
     private val WAKE_TIME = LocalTime.of(6, 0)

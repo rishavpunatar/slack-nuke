@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.slacknuke"
+    namespace = "com.slacklock"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.slacknuke"
+        applicationId = "com.slacklock"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

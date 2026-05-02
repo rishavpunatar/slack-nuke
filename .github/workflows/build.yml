@@ -28,13 +28,13 @@ jobs:
         run: ./gradlew assembleRelease --no-daemon
 
       - name: Rename APK
-        run: cp app/build/outputs/apk/release/app-release.apk slack-nuke.apk
+        run: cp app/build/outputs/apk/release/app-release.apk slack-lock.apk
 
       - name: Upload APK as workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: slack-nuke-apk
-          path: slack-nuke.apk
+          name: slack-lock-apk
+          path: slack-lock.apk
 
       - name: Publish rolling "latest" release
         if: github.ref == 'refs/heads/main'
@@ -44,6 +44,6 @@ jobs:
           name: Latest build
           body: |
             Auto-built from the latest commit on `main`.
-            Download `slack-nuke.apk` below and sideload Slack Lock on your phone.
-          files: slack-nuke.apk
+            Download `slack-lock.apk` below and sideload Slack Lock on your phone.
+          files: slack-lock.apk
           make_latest: true

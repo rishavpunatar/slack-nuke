@@ -1,4 +1,4 @@
-package com.slacknuke
+package com.slacklock
 
 import android.accessibilityservice.AccessibilityService
 import android.view.accessibility.AccessibilityEvent

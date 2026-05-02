@@ -16,9 +16,9 @@ Built for Android 8+.
 
 Every push to `main` builds a fresh APK and attaches it to a rolling release at:
 
-> **https://github.com/rishavpunatar/slack-nuke/releases/latest**
+> **https://github.com/rishavpunatar/slack-lock/releases/latest**
 
-On your phone, open that page in Chrome and tap `slack-nuke.apk` to download.
+On your phone, open that page in Chrome and tap `slack-lock.apk` to download.
 
 ### 2. Allow installs from your browser
 
@@ -87,8 +87,8 @@ CI runs tests, builds a release APK, and attaches it to the `latest` release. Lo
 
 ```bash
 # Requires JDK 17 and Android SDK 34.
-git clone https://github.com/rishavpunatar/slack-nuke.git
-cd slack-nuke
+git clone https://github.com/rishavpunatar/slack-lock.git
+cd slack-lock
 ./gradlew testDebugUnitTest assembleRelease
 # APK at app/build/outputs/apk/release/app-release.apk
 ```
@@ -99,6 +99,6 @@ The public repo builds a non-debuggable release variant signed with Android's de
 
 ## Customizing
 
-The 6 AM rule lives in [`BlockState.kt`](app/src/main/java/com/slacknuke/BlockState.kt). Change the `WAKE_TIME` value, rebuild, and reinstall.
+The 6 AM rule lives in [`BlockState.kt`](app/src/main/java/com/slacklock/BlockState.kt). Change the `WAKE_TIME` value, rebuild, and reinstall.
 
-To block additional apps, add their package names to [`accessibility_config.xml`](app/src/main/res/xml/accessibility_config.xml) and update the package check in [`BlockerService.kt`](app/src/main/java/com/slacknuke/BlockerService.kt).
+To block additional apps, add their package names to [`accessibility_config.xml`](app/src/main/res/xml/accessibility_config.xml) and update the package check in [`BlockerService.kt`](app/src/main/java/com/slacklock/BlockerService.kt).

@@ -1,4 +1,4 @@
-package com.slacknuke
+package com.slacklock
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
