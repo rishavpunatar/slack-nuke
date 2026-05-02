@@ -23,13 +23,18 @@
     <string name="duration_1_hour">1 hour</string>
     <string name="duration_2_hours">2 hours</string>
     <string name="duration_4_hours">4 hours</string>
+    <string name="duration_1_day">1 day</string>
+    <string name="duration_3_days">3 days</string>
+    <string name="duration_7_days">7 days</string>
+    <string name="duration_14_days">14 days</string>
     <string name="duration_until_6_am">Until next 6 AM</string>
     <string name="duration_custom">Custom timer</string>
     <string name="custom_duration_title">Custom timer</string>
+    <string name="duration_days_picker">%1$d d</string>
     <string name="duration_hours_picker">%1$d hr</string>
     <string name="duration_minutes_picker">%1$d min</string>
     <string name="duration_continue">Continue</string>
-    <string name="duration_invalid">Choose at least 15 minutes.</string>
+    <string name="duration_invalid">Choose a duration from 15 minutes to 14 days.</string>
 
     <string name="confirm_title">Lock Slack?</string>
     <string name="confirm_message">Opening Slack before %1$s will return you to the home screen. There is no in-app undo. To stop early, disable Slack Lock in Accessibility Settings or uninstall it.</string>

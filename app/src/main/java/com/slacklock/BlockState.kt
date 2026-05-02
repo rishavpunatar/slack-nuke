@@ -16,6 +16,8 @@ object BlockState {
     private const val KEY_BLOCK_UNTIL = "block_until_millis"
     private const val KEY_ACCESSIBILITY_DISCLOSURE_ACCEPTED = "accessibility_disclosure_accepted"
     private val WAKE_TIME = LocalTime.of(6, 0)
+    const val MAX_DURATION_DAYS = 14
+    const val MAX_DURATION_MINUTES = MAX_DURATION_DAYS * 24L * 60L
 
     /** Slack's Play Store package name. */
     const val SLACK_PACKAGE = "com.Slack"
@@ -47,7 +49,15 @@ object BlockState {
     fun blockUntilMillisForDurationMinutes(
         durationMinutes: Long,
         now: ZonedDateTime = ZonedDateTime.now()
-    ): Long = now.plusMinutes(durationMinutes).toInstant().toEpochMilli()
+    ): Long {
+        require(isValidDurationMinutes(durationMinutes)) {
+            "Duration must be between 1 minute and $MAX_DURATION_DAYS days."
+        }
+        return now.plusMinutes(durationMinutes).toInstant().toEpochMilli()
+    }
+
+    fun isValidDurationMinutes(durationMinutes: Long): Boolean =
+        durationMinutes in 1..MAX_DURATION_MINUTES
 
     fun startBlockUntil(ctx: Context, untilMillis: Long) {
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)

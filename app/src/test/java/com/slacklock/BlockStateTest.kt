@@ -1,6 +1,8 @@
 package com.slacklock
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -42,5 +44,22 @@ class BlockStateTest {
             expected.toInstant().toEpochMilli(),
             BlockState.blockUntilMillisForDurationMinutes(90, now)
         )
+    }
+
+    @Test
+    fun durationBlockSupportsFourteenDays() {
+        val now = ZonedDateTime.of(2026, 4, 29, 9, 30, 0, 0, zone)
+        val expected = ZonedDateTime.of(2026, 5, 13, 9, 30, 0, 0, zone)
+
+        assertEquals(
+            expected.toInstant().toEpochMilli(),
+            BlockState.blockUntilMillisForDurationMinutes(BlockState.MAX_DURATION_MINUTES, now)
+        )
+    }
+
+    @Test
+    fun durationValidationRejectsMoreThanFourteenDays() {
+        assertTrue(BlockState.isValidDurationMinutes(BlockState.MAX_DURATION_MINUTES))
+        assertFalse(BlockState.isValidDurationMinutes(BlockState.MAX_DURATION_MINUTES + 1))
     }
 }

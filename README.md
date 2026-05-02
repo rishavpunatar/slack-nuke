@@ -46,7 +46,7 @@ Android restricts sideloaded apps from enabling sensitive settings until you exp
 
 ### 4. Use it
 
-Open **Slack Lock**, tap the button, choose a timer, and confirm the lock. Presets include 30 minutes, 1 hour, 2 hours, 4 hours, and the original "until next 6 AM" mode. You can also choose a custom hours/minutes timer.
+Open **Slack Lock**, tap the button, choose a timer, and confirm the lock. Presets include 30 minutes, 1 hour, 2 hours, 4 hours, 1 day, 3 days, 7 days, 14 days, and the original "until next 6 AM" mode. You can also choose a custom days/hours/minutes timer up to 14 days.
 
 There is no in-app undo while a lock is active. To stop early, leave the app and either disable **Slack Lock** in Android Accessibility Settings or uninstall the app.
 

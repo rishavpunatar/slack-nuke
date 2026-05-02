@@ -22,7 +22,16 @@ import java.util.Date
 
 class MainActivity : Activity() {
 
-    private val presetDurationsMinutes = longArrayOf(30, 60, 120, 240)
+    private val presetDurationsMinutes = longArrayOf(
+        30L,
+        60L,
+        120L,
+        240L,
+        24L * 60L,
+        3L * 24L * 60L,
+        7L * 24L * 60L,
+        BlockState.MAX_DURATION_MINUTES
+    )
     private val customMinuteValues = intArrayOf(0, 15, 30, 45)
 
     private lateinit var bigButton: Button
@@ -142,6 +151,10 @@ class MainActivity : Activity() {
             getString(R.string.duration_1_hour),
             getString(R.string.duration_2_hours),
             getString(R.string.duration_4_hours),
+            getString(R.string.duration_1_day),
+            getString(R.string.duration_3_days),
+            getString(R.string.duration_7_days),
+            getString(R.string.duration_14_days),
             getString(R.string.duration_until_6_am),
             getString(R.string.duration_custom)
         )
@@ -166,10 +179,19 @@ class MainActivity : Activity() {
     }
 
     private fun showCustomDurationDialog() {
+        val daysPicker = NumberPicker(this).apply {
+            minValue = 0
+            maxValue = BlockState.MAX_DURATION_DAYS
+            displayedValues = Array(BlockState.MAX_DURATION_DAYS + 1) {
+                getString(R.string.duration_days_picker, it)
+            }
+            value = 0
+            wrapSelectorWheel = false
+        }
         val hoursPicker = NumberPicker(this).apply {
             minValue = 0
-            maxValue = 24
-            displayedValues = Array(25) { getString(R.string.duration_hours_picker, it) }
+            maxValue = 23
+            displayedValues = Array(24) { getString(R.string.duration_hours_picker, it) }
             value = 1
             wrapSelectorWheel = false
         }
@@ -186,6 +208,7 @@ class MainActivity : Activity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
             setPadding(dp(20), dp(8), dp(20), dp(8))
+            addView(daysPicker, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
             addView(hoursPicker, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
             addView(minutesPicker, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
         }
@@ -194,8 +217,10 @@ class MainActivity : Activity() {
             .setTitle(R.string.custom_duration_title)
             .setView(container)
             .setPositiveButton(R.string.duration_continue) { _, _ ->
-                val durationMinutes = hoursPicker.value * 60L + customMinuteValues[minutesPicker.value]
-                if (durationMinutes <= 0) {
+                val durationMinutes = daysPicker.value * 24L * 60L +
+                    hoursPicker.value * 60L +
+                    customMinuteValues[minutesPicker.value]
+                if (!BlockState.isValidDurationMinutes(durationMinutes)) {
                     Toast.makeText(this, R.string.duration_invalid, Toast.LENGTH_SHORT).show()
                     showCustomDurationDialog()
                 } else {
